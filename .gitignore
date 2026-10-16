@@ -1,0 +1,10 @@
+# NixOS build outputs (symlinks to /nix/store)
+result
+result-*
+
+# Backups / clutter
+*.bak
+*.swp
+
+# Old lazy.nvim neovim config (kept on disk as a backup, not in the repo)
+home/nvim.bak.old-lazy/
