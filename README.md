@@ -11,6 +11,29 @@ sudo nixos-rebuild switch --flake /etc/nixos#nixos
 This repo **is** the system: edit a `.nix` file, rebuild, and NixOS produces a
 new immutable generation. Roll back with `sudo nixos-rebuild switch --rollback`.
 
+## Philosophy
+
+Terminal-first and intentionally lean. The desktop is **Sway** (Wayland) with a
+handful of tiny helpers instead of a full compositor shell, so idle CPU and RAM
+stay low. There is no Noctalia, no GTK panel, no Electron apps and no bundled
+browser engine beyond what WebKitGTK needs.
+
+Everyday surface:
+
+| Role        | Choice                                             |
+|-------------|----------------------------------------------------|
+| Compositor  | Sway (Wayland)                                      |
+| Terminal    | foot                                                |
+| Shell       | bash + starship                                     |
+| Bar         | swaybar + i3status-rust (CPU/mem/battery/net/clock) |
+| Launcher    | fuzzel                                              |
+| Notifications | mako                                              |
+| Browser     | dillo-plus (Super+w) + Brave Origin (Super+Shift+w) |
+| Files       | yazi (TUI)                                          |
+| Editor      | Neovim (nvf)                                        |
+| Media       | mpv / yt-dlp / ani-cli / yt-x                       |
+| Login       | ly (TUI)                                            |
+
 ## Layout
 
 ```
@@ -20,10 +43,10 @@ new immutable generation. Roll back with `sudo nixos-rebuild switch --rollback`.
 │
 ├── modules/               # shared system config
 │   ├── configuration.nix  # main module: imports the rest, bootloader, users, nix, home-manager
-│   ├── desktop.nix        # Hyprland + Noctalia + portals + login manager
-│   ├── services.nix       # docker, flatpak, tailscale, steam, bluetooth
+│   ├── desktop.nix        # Sway + wlr portals + ly login manager
+│   ├── services.nix       # bluetooth (only)
 │   ├── networking.nix     # NetworkManager + hostname
-│   ├── packages.nix       # system-wide packages
+│   ├── packages.nix       # system-wide packages (CLI-first)
 │   └── hardware/
 │       ├── nvidia.nix     # NVIDIA / hybrid PRIME
 │       └── battery.nix    # laptop power management
@@ -34,10 +57,11 @@ new immutable generation. Roll back with `sudo nixos-rebuild switch --rollback`.
 │
 └── home/                  # per-user config (home-manager)
     ├── arctan.nix         # user entry point: imports the rest
-    ├── hyprland.nix       # Hyprland (Lua) config
-    ├── kitty.nix          # terminal
+    ├── sway.nix           # Sway keybindings, bar, colors
+    ├── foot.nix           # terminal
+    ├── fuzzel.nix         # launcher
+    ├── dillo.nix          # primary browser
     ├── starship.nix       # shell prompt
-    ├── qutebrowser.nix    # browser
     ├── neovim.nix         # Neovim (nvf)
     ├── fonts.nix          # fonts
     └── yt-x.nix           # yt-x

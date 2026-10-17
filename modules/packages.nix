@@ -1,52 +1,68 @@
-# System-wide packages. yt-x comes from its own flake input (see flake.nix).
+# System-wide packages. Terminal-first and deliberately lean: everything here
+# is either a CLI program or a small Wayland helper. Browsers, terminals, the
+# bar and notifications are managed per-user in home-manager.
 {
   pkgs,
   inputs,
   ...
 }: {
   environment.systemPackages = with pkgs; [
+    # core CLI
     git
     wget
     curl
-
-    librewolf
-    qutebrowser
-
-    playerctl
-    pavucontrol
-    networkmanagerapplet
-    kitty
-
-    thunar
-    tumbler
-    thunar-volman
-    thunar-archive-plugin
-    gvfs
-
-    gdu
-    prismlauncher
-    thunderbird
-    postman
-    discord
-    libreoffice
-    btop
-    powertop
-    unzip
-    opencode
     ripgrep
     fzf
-    inputs.yt-x.packages.${pkgs.stdenv.hostPlatform.system}.default
-    mpv
+    fd
     jq
+    tree
+    unzip
+    p7zip
+    xdg-utils
+
+    # system / process inspection
+    btop
+    powertop
+    gdu
+
+    # terminal niceties
+    chafa
+
+    # Wayland session helpers (invoked from sway keybindings)
+    fuzzel
+    grim
+    slurp
+    wl-clipboard
+    swappy
+    swaybg
+    swaylock
+    swayidle
+    brightnessctl
+    pamixer
+    playerctl
+
+    # network / bluetooth TUIs
+    impala
+    bluetui
+
+    # media (CLI)
+    mpv
+    ffmpeg
     ani-cli
     yt-dlp
-    ueberzugpp
-    bibata-cursors
-    tree
-    chafa
-    vscode
-    nodejs
 
+    # browsers
+    dillo-plus
+    brave-origin
+
+    # light graphical apps
+    imv
+    mupdf
+
+    # theming
+    bibata-cursors
+
+    # dev toolchain
     gcc
     clang
     clang-tools
@@ -55,12 +71,13 @@
     ninja
     gnumake
     pkg-config
-
     rustc
     cargo
     clippy
     rustfmt
     rust-analyzer
+    nodejs
 
+    opencode
   ];
 }

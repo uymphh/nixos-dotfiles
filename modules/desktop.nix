@@ -1,63 +1,23 @@
-# Wayland desktop: Hyprland + Noctalia + portals + login manager.
-{inputs, config, lib, pkgs, ...}: {
-  imports = [
-    inputs.noctalia.nixosModules.default
-  ];
-
-  programs.hyprland = {
+# Wayland desktop: Sway + wlroots portals + ly login manager.
+# Deliberately minimal: no compositor shell, no GUI daemons beyond what a
+# Sway session needs (the bar + notifications live in home-manager).
+#
+# Note on the "proprietary GPU drivers are not supported" warning Sway prints:
+# this machine is a hybrid Intel + NVIDIA laptop. Sway/wlroots runs on the
+# Intel iGPU (Mesa, open source); the NVIDIA dGPU is kept purely for on-demand
+# offload (see modules/hardware/nvidia.nix, hardware.nvidia.prime.offload).
+# wlroots still detects the loaded nvidia module and warns, but it is harmless
+# here because Sway never drives the NVIDIA adapter directly.
+{pkgs, ...}: {
+  programs.sway = {
     enable = true;
-    xwayland.enable = true;
-  };
-
-  programs.noctalia = {
-    enable = true;
-    systemd = {
-      enable = true;
-      target = "graphical-session.target";
-    };
+    wrapperFeatures.gtk = true;
   };
 
   xdg.portal = {
     enable = true;
-    extraPortals = [pkgs.xdg-desktop-portal-gtk pkgs.xdg-desktop-portal-hyprland];
-    config.common.default = ["hyprland" "gtk"];
-  };
-  systemd.user.targets.graphical-session = {
-    description = "Graphical session target";
-    wantedBy = ["default.target"];
-  };
-  systemd.user.paths.noctalia-theme = {
-    description = "Watch Noctalia theme file";
-    wantedBy = ["default.target"];
-    pathConfig = {
-      PathChanged = "%h/.config/hypr/noctalia.lua";
-      Unit = "noctalia-theme-reload.service";
-    };
-  };
-  systemd.user.services.noctalia-theme-reload = {
-    description = "Reload Hyprland when the Noctalia theme changes";
-    serviceConfig = {
-      Type = "oneshot";
-      ExecStart = "${config.programs.hyprland.package}/bin/hyprctl reload";
-    };
-  };
-
-  systemd.user.services.noctalia = {
-    startLimitIntervalSec = 0;
-    startLimitBurst = 0;
-    serviceConfig = {
-      Restart   = lib.mkForce "always";
-      RestartSec = "2";
-    };
-  };
-  systemd.user.services.activate-graphical-session = {
-    description = "Activate graphical-session.target so xdg-desktop-portal can start";
-    unitConfig.Wants = ["graphical-session.target"];
-    serviceConfig = {
-      Type = "oneshot";
-      RemainAfterExit = true;
-      ExecStart = "${pkgs.coreutils}/bin/true";
-    };
+    extraPortals = [pkgs.xdg-desktop-portal-gtk pkgs.xdg-desktop-portal-wlr];
+    config.common.default = ["wlr" "gtk"];
   };
 
   environment.sessionVariables = {
@@ -66,6 +26,10 @@
     XCURSOR_SIZE = "24";
   };
 
+  # ly is a tiny TUI login manager -- fits the CLI-first theme.
   services.displayManager.ly.enable = true;
+
+  # The X server is never started (Sway is Wayland-only) but the option is kept
+  # on so the NVIDIA driver wiring and XWayland helper stay intact.
   services.xserver.enable = true;
 }

@@ -183,66 +183,7 @@
         # --- Usability / looks --------------------------------------
         binds.whichKey.enable = true;
 
-        # --- Theme: Noctalia / matugen ------------------------------
-        # Noctalia renders a base16 palette to ~/.config/nvim/lua/matugen.lua
-        # (regenerated on wallpaper change; the module reloads itself on
-        # SIGUSR1). base16-nvim provides the `base16-colorscheme` module it
-        # calls. We load it LAST so it wins over everything else.
-        #
-        # We also look in arctan's config so `sudo vi` (HOME=/root) still finds
-        # the palette, and poll the file's mtime so root re-themes live too -
-        # Noctalia signals nvim with SIGUSR1, but a normal user cannot signal a
-        # root-owned process.
         luaConfigPost = ''
-          do
-            local dirs = {
-              vim.fn.expand("~/.config/nvim/lua"),
-              "/home/arctan/.config/nvim/lua",
-            }
-            local dir
-            for _, d in ipairs(dirs) do
-              if vim.fn.filereadable(d .. "/matugen.lua") == 1 then
-                dir = d
-                break
-              end
-            end
-
-            local function apply()
-              if dir then
-                package.path = package.path .. ";" .. dir .. "/?.lua"
-                package.loaded["matugen"] = nil
-                require("matugen").setup()
-              else
-                require("base16-colorscheme").setup({
-                  base00 = "#1f1f1f", base01 = "#333333", base02 = "#2e2e2e", base03 = "#696969",
-                  base04 = "#b6afaf", base05 = "#f3f2f2", base06 = "#f3f2f2", base07 = "#f3f2f2",
-                  base08 = "#fd4663", base09 = "#cc6666", base0A = "#d65c5c", base0B = "#e46767",
-                  base0C = "#e99696", base0D = "#ec9393", base0E = "#e99696", base0F = "#f4bebe",
-                })
-              end
-            end
-
-            apply()
-
-            if dir then
-              local uv = vim.uv or vim.loop
-              local path = dir .. "/matugen.lua"
-              local function mtime()
-                local s = uv.fs_stat(path)
-                return s and (s.mtime.sec * 1000 + s.mtime.nsec / 1e6) or 0
-              end
-              local last = mtime()
-              local timer = uv.new_timer()
-              timer:start(1000, 1000, vim.schedule_wrap(function()
-                local m = mtime()
-                if m ~= last then
-                  last = m
-                  apply()
-                end
-              end))
-            end
-          end
-
           -- <leader>r in a Rust buffer: compile and run in a terminal split.
           --   * inside a Cargo project -> `cargo run`
           --   * a standalone .rs file  -> `rustc <file> -o <stem> && ./<stem>`
@@ -287,6 +228,62 @@
                 })
               end,
             })
+          end
+
+          -- Black & white UI (matches the Sway/foot theme). Syntax groups are
+          -- intentionally left untouched so code keeps its highlighting.
+          do
+            vim.o.background = "dark"
+            pcall(vim.cmd.colorscheme, "default")
+
+            local hl = vim.api.nvim_set_hl
+            local black, white, gray = "#000000", "#ffffff", "#888888"
+
+            hl(0, "Normal", { fg = white, bg = black })
+            hl(0, "NormalNC", { fg = white, bg = black })
+            hl(0, "NormalFloat", { fg = white, bg = "#0a0a0a" })
+            hl(0, "FloatBorder", { fg = "#555555", bg = "#0a0a0a" })
+            hl(0, "FloatTitle", { fg = white, bg = "#0a0a0a", bold = true })
+
+            hl(0, "StatusLine", { fg = black, bg = white, bold = true })
+            hl(0, "StatusLineNC", { fg = gray, bg = "#1a1a1a" })
+            hl(0, "WinSeparator", { fg = "#333333", bg = black })
+            hl(0, "VertSplit", { fg = "#333333", bg = black })
+
+            hl(0, "LineNr", { fg = "#555555", bg = black })
+            hl(0, "CursorLineNr", { fg = white, bg = black, bold = true })
+            hl(0, "CursorLine", { bg = "#101010" })
+            hl(0, "CursorColumn", { bg = "#101010" })
+            hl(0, "ColorColumn", { bg = "#101010" })
+            hl(0, "SignColumn", { bg = black })
+            hl(0, "FoldColumn", { fg = "#555555", bg = black })
+            hl(0, "Folded", { fg = gray, bg = "#0a0a0a" })
+
+            hl(0, "Pmenu", { fg = white, bg = "#0a0a0a" })
+            hl(0, "PmenuSel", { fg = black, bg = white })
+            hl(0, "PmenuSbar", { bg = "#1a1a1a" })
+            hl(0, "PmenuThumb", { bg = "#444444" })
+
+            hl(0, "Visual", { fg = black, bg = white })
+            hl(0, "Search", { fg = black, bg = white })
+            hl(0, "IncSearch", { fg = black, bg = "#cccccc" })
+            hl(0, "MatchParen", { fg = white, bg = "#333333", bold = true })
+
+            hl(0, "Directory", { fg = white })
+            hl(0, "Title", { fg = white, bold = true })
+            hl(0, "Comment", { fg = gray })
+            hl(0, "NonText", { fg = "#333333" })
+            hl(0, "SpecialKey", { fg = "#555555" })
+            hl(0, "Whitespace", { fg = "#2a2a2a" })
+
+            hl(0, "TabLine", { fg = gray, bg = "#1a1a1a" })
+            hl(0, "TabLineSel", { fg = black, bg = white, bold = true })
+            hl(0, "TabLineFill", { bg = "#1a1a1a" })
+
+            hl(0, "DiffAdd", { fg = "#bbbbbb", bg = "#1a1a1a" })
+            hl(0, "DiffChange", { fg = "#bbbbbb", bg = "#1a1a1a" })
+            hl(0, "DiffDelete", { fg = "#777777", bg = "#1a1a1a" })
+            hl(0, "DiffText", { fg = white, bg = "#333333" })
           end
         '';
 
@@ -407,9 +404,6 @@
 
         # --- CompetiTest (CP Editor-style testcase manager) ---------
         extraPlugins = {
-          base16 = {
-            package = pkgs.vimPlugins.base16-nvim;
-          };
           nui = {
             package = pkgs.vimPlugins.nui-nvim;
           };

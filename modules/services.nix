@@ -1,12 +1,7 @@
-# System services: flatpak, steam, bluetooth.
-# Docker and Tailscale are disabled to cut idle wakeups / background daemons;
-# set the flags back to true (or start the units manually) when needed.
+# System services. Kept to the bare minimum: only Bluetooth is on. Docker,
+# Tailscale, Flatpak and Steam are intentionally disabled/absent to avoid
+# background daemons and idle wakeups.
 {...}: {
-  virtualisation.docker.enable = false;
-  services.tailscale.enable = false;
-  services.flatpak.enable = true;
-  programs.steam.enable = true;
-
   hardware.bluetooth = {
     enable = true;
     powerOnBoot = true;
