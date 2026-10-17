@@ -126,7 +126,6 @@
       ];
 
       keybindings = lib.mkOptionDefault {
-        "Mod4+w" = "exec ${pkgs.dillo-plus}/bin/dillo-plus";
         "Mod4+space" = "exec ${pkgs.fuzzel}/bin/fuzzel";
         "Mod4+Shift+w" = "exec ${pkgs.brave-origin}/bin/brave-origin";
         "Mod4+q" = "kill";

@@ -28,9 +28,9 @@ Everyday surface:
 | Bar         | swaybar + i3status-rust (CPU/mem/battery/net/clock) |
 | Launcher    | fuzzel                                              |
 | Notifications | mako                                              |
-| Browser     | dillo-plus (Super+w) + Brave Origin (Super+Shift+w) |
+| Browser     | Brave Origin (Super+Shift+w)                        |
 | Files       | yazi (TUI)                                          |
-| Editor      | Neovim (nvf)                                        |
+| Editor      | Neovim (nvf) + VSCodium                             |
 | Media       | mpv / yt-dlp / ani-cli / yt-x                       |
 | Login       | ly (TUI)                                            |
 
@@ -60,7 +60,6 @@ Everyday surface:
     ├── sway.nix           # Sway keybindings, bar, colors
     ├── foot.nix           # terminal
     ├── fuzzel.nix         # launcher
-    ├── dillo.nix          # primary browser
     ├── starship.nix       # shell prompt
     ├── neovim.nix         # Neovim (nvf)
     ├── fonts.nix          # fonts

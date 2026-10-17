@@ -7,7 +7,6 @@
     ./sway.nix
     ./foot.nix
     ./fuzzel.nix
-    ./dillo.nix
     ./starship.nix
     ./neovim.nix
   ];

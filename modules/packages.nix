@@ -52,8 +52,10 @@
     yt-dlp
 
     # browsers
-    dillo-plus
     brave-origin
+
+    # editor
+    vscodium
 
     # light graphical apps
     imv
